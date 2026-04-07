@@ -166,34 +166,35 @@ export default function SystemLogs() {
         </button>
       </div>
 
-      {/* Charts */}
       {requestsPerEndpoint.length > 0 && (
-        <ChartCard title="Requests per Endpoint" subtitle="Total API calls by endpoint">
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={requestsPerEndpoint} layout="vertical" margin={{ left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
-              <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="endpoint" tick={{ fill: cc.legend, fontSize: 10 }} axisLine={false} tickLine={false} width={140} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="requests" fill="#4CB79E" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <ChartCard title="Requests per Endpoint" subtitle="Total API calls by endpoint">
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={requestsPerEndpoint} layout="vertical" margin={{ left: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
+                <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="endpoint" tick={{ fill: cc.legend, fontSize: 10 }} axisLine={false} tickLine={false} width={140} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="requests" fill="#4CB79E" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
-        <ChartCard title="Error Rate Over Time" subtitle="Daily total requests vs errors">
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={errorRateOverTime}>
-              <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
-              <XAxis dataKey="date" tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
-              <Line type="monotone" dataKey="total" stroke="#4CB79E" strokeWidth={2} dot={{ fill: '#4CB79E', r: 3 }} name="Total Requests" />
-              <Line type="monotone" dataKey="errors" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Errors" />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+          <ChartCard title="Error Rate Over Time" subtitle="Daily total requests vs errors">
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={errorRateOverTime}>
+                <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
+                <XAxis dataKey="date" tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
+                <Line type="monotone" dataKey="total" stroke="#4CB79E" strokeWidth={2} dot={{ fill: '#4CB79E', r: 3 }} name="Total Requests" />
+                <Line type="monotone" dataKey="errors" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Errors" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+      )}
 
       {/* Logs Table */}
       <DataTable

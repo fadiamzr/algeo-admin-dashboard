@@ -3,7 +3,6 @@ import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
 import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
-import { apiGetAgents, apiCreateAgent, apiUpdateAgent, apiDeleteAgent } from '../api';
 
 export default function Agents() {
   const [agents, setAgents] = useState([]);

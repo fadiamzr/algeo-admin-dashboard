@@ -89,6 +89,10 @@ export async function apiGetErrorRate() {
   return apiFetch('/api/admin/logs/error-rate');
 }
 
+export async function apiGetRequestsPerEndpoint() {
+  return apiFetch('/api/admin/logs/requests-per-endpoint');
+}
+
 // ─── Analytics ────────────────────────────────────────────────────────────────
 export async function apiGetScoreDistribution() {
   return apiFetch('/api/admin/analytics/score-distribution');
