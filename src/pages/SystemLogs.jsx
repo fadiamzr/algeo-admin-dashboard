@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
 import ChartCard from '../components/charts/ChartCard';
 import { useTheme } from '../contexts/ThemeContext';
-import { apiLogs, errorRateOverTime, requestsPerEndpoint } from '../mockData';
 import { Server, AlertCircle } from 'lucide-react';
+import { apiGetLogs, apiGetRequestsPerEndpoint, apiGetErrorRate } from '../api';
 import {
   BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -23,10 +23,30 @@ function useChartColors() {
 
 export default function SystemLogs() {
   const [tab, setTab] = useState('api');
+  const [logs, setLogs] = useState([]);
+  const [requestsPerEndpoint, setRequestsPerEndpoint] = useState([]);
+  const [errorRate, setErrorRate] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { isDark } = useTheme();
   const cc = useChartColors();
 
-  const errorLogs = apiLogs.filter((l) => l.statusCode >= 400);
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      apiGetLogs(200),
+      apiGetRequestsPerEndpoint(),
+      apiGetErrorRate(),
+    ])
+      .then(([logsData, endpointsData, errorRateData]) => {
+        setLogs(logsData);
+        setRequestsPerEndpoint(endpointsData);
+        setErrorRate(errorRateData);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const errorLogs = logs.filter((l) => l.statusCode >= 400);
 
   const methodColor = {
     GET: 'text-emerald-600 bg-emerald-500/10',
@@ -90,10 +110,36 @@ export default function SystemLogs() {
     },
   ];
 
-  const displayData = tab === 'api' ? apiLogs : errorLogs;
+  const displayData = tab === 'api' ? logs : errorLogs;
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
+    </div>
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Error Rate Summary */}
+      {errorRate && (
+        <div className="glass-card p-4 flex items-center gap-6">
+          <div>
+            <p className="text-xs t-faint uppercase">Total Requests</p>
+            <p className="text-2xl font-bold t-primary">{errorRate.total}</p>
+          </div>
+          <div>
+            <p className="text-xs t-faint uppercase">Errors</p>
+            <p className="text-2xl font-bold text-red-500">{errorRate.errors}</p>
+          </div>
+          <div>
+            <p className="text-xs t-faint uppercase">Error Rate</p>
+            <p className={`text-2xl font-bold ${errorRate.errorRate > 5 ? 'text-red-500' : 'text-emerald-500'}`}>
+              {errorRate.errorRate}%
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex items-center gap-2">
         <button
@@ -104,8 +150,8 @@ export default function SystemLogs() {
               : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
           }`}
         >
-          <Server size={16} /> API Usage
-          <span className="text-xs opacity-60">({apiLogs.length})</span>
+          <Server size={16} /> API Logs
+          <span className="text-xs opacity-60">({logs.length})</span>
         </button>
         <button
           onClick={() => setTab('errors')}
@@ -120,8 +166,8 @@ export default function SystemLogs() {
         </button>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Charts */}
+      {requestsPerEndpoint.length > 0 && (
         <ChartCard title="Requests per Endpoint" subtitle="Total API calls by endpoint">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={requestsPerEndpoint} layout="vertical" margin={{ left: 40 }}>
@@ -129,25 +175,11 @@ export default function SystemLogs() {
               <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="endpoint" tick={{ fill: cc.legend, fontSize: 10 }} axisLine={false} tickLine={false} width={140} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="requests" fill="#6366f1" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
+              <Bar dataKey="count" fill="#6366f1" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-
-        <ChartCard title="Error Rate Over Time" subtitle="Daily total requests vs errors">
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={errorRateOverTime}>
-              <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
-              <XAxis dataKey="date" tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
-              <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} name="Total Requests" />
-              <Line type="monotone" dataKey="errors" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Errors" />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+      )}
 
       {/* Logs Table */}
       <DataTable

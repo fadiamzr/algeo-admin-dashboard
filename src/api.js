@@ -93,3 +93,14 @@ export async function apiGetErrorRate() {
 export async function apiGetScoreDistribution() {
   return apiFetch('/api/admin/analytics/score-distribution');
 }
+export async function apiCreateAgent(userId) {
+  return apiFetch(`/api/admin/agents?user_id=${userId}`, { method: 'POST' });
+}
+
+export async function apiUpdateAgent(agentId, companyId) {
+  return apiFetch(`/api/admin/agents/${agentId}?company_id=${companyId}`, { method: 'PUT' });
+}
+
+export async function apiDeleteAgent(agentId) {
+  return apiFetch(`/api/admin/agents/${agentId}`, { method: 'DELETE' });
+}
