@@ -11,7 +11,7 @@ export default function DashboardLayout() {
   const sidebarWidth = collapsed ? 72 : 260;
 
   return (
-    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: isDark ? '#020617' : '#f1f5f9' }}>
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: isDark ? '#0A1220' : '#F2F6FA' }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div
         className="transition-all duration-300 ease-in-out"

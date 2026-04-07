@@ -30,7 +30,7 @@ export default function TopBar() {
     >
       {/* Left: Page title */}
       <div>
-        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-dark-900'}`}>{title}</h2>
+        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-navy-900'}`}>{title}</h2>
         <p className="text-xs t-faint mt-0.5">Welcome back, {user?.name?.split(' ')[0] || 'Admin'}</p>
       </div>
 
@@ -50,9 +50,7 @@ export default function TopBar() {
         <button
           onClick={toggleTheme}
           className={`p-2.5 rounded-xl transition-all duration-300 ${
-            isDark
-              ? 'hover:bg-white/5 text-dark-400 hover:text-amber-400'
-              : 'hover:bg-black/5 text-dark-500 hover:text-primary-600'
+            isDark ? 'hover:bg-white/5 text-navy-400 hover:text-amber-400' : 'hover:bg-black/5 text-navy-500 hover:text-teal-500'
           }`}
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
@@ -65,25 +63,25 @@ export default function TopBar() {
 
         {/* Notifications */}
         <button className={`relative p-2 rounded-xl transition-colors ${
-          isDark ? 'hover:bg-white/5 text-dark-400 hover:text-dark-200' : 'hover:bg-black/5 text-dark-500 hover:text-dark-700'
+          isDark ? 'hover:bg-white/5 text-navy-400 hover:text-navy-200' : 'hover:bg-black/5 text-navy-500 hover:text-navy-700'
         }`}>
           <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-teal-400 rounded-full animate-pulse" />
         </button>
 
         {/* User avatar + logout */}
         <div className="flex items-center gap-3 pl-4" style={{ borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-sm font-semibold">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-300 to-teal-500 flex items-center justify-center text-white text-sm font-semibold">
             {user?.name?.charAt(0) || 'A'}
           </div>
           <div className="hidden sm:block">
-            <p className={`text-sm font-medium ${isDark ? 'text-dark-100' : 'text-dark-800'}`}>{user?.name || 'Admin'}</p>
+            <p className={`text-sm font-medium ${isDark ? 'text-navy-100' : 'text-navy-800'}`}>{user?.name || 'Admin'}</p>
             <p className="text-xs t-faint">{user?.role || 'admin'}</p>
           </div>
           <button
             onClick={logout}
             className={`p-2 rounded-xl transition-colors ${
-              isDark ? 'hover:bg-red-500/10 text-dark-500 hover:text-red-400' : 'hover:bg-red-50 text-dark-400 hover:text-red-500'
+              isDark ? 'hover:bg-red-500/10 text-navy-500 hover:text-red-400' : 'hover:bg-red-50 text-navy-400 hover:text-red-500'
             }`}
             title="Logout"
           >

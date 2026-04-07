@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Hexagon, Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('admin@algeo.dz');
@@ -32,10 +32,10 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0" style={{ background: isDark ? '#020617' : '#f4f6fb' }} />
-      <div className={`absolute top-1/4 -left-32 w-96 h-96 rounded-full blur-[128px] ${isDark ? 'bg-primary-600/20' : 'bg-primary-400/20'}`} />
-      <div className={`absolute bottom-1/4 -right-32 w-96 h-96 rounded-full blur-[128px] ${isDark ? 'bg-primary-500/15' : 'bg-primary-300/15'}`} />
-      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[200px] ${isDark ? 'bg-primary-700/10' : 'bg-primary-200/20'}`} />
+      <div className="absolute inset-0" style={{ background: isDark ? '#0A1220' : '#F2F6FA' }} />
+      <div className={`absolute top-1/4 -left-32 w-96 h-96 rounded-full blur-[128px] ${isDark ? 'bg-teal-400/15' : 'bg-teal-300/20'}`} />
+      <div className={`absolute bottom-1/4 -right-32 w-96 h-96 rounded-full blur-[128px] ${isDark ? 'bg-teal-500/10' : 'bg-teal-200/15'}`} />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[200px] ${isDark ? 'bg-navy-700/30' : 'bg-teal-100/30'}`} />
 
       {/* Grid pattern */}
       <div
@@ -50,7 +50,7 @@ export default function Login() {
       <button
         onClick={toggleTheme}
         className={`absolute top-6 right-6 z-10 p-2.5 rounded-xl transition-all duration-300 ${
-          isDark ? 'hover:bg-white/5 text-dark-400 hover:text-amber-400' : 'hover:bg-black/5 text-dark-500 hover:text-primary-600'
+          isDark ? 'hover:bg-white/5 text-navy-400 hover:text-amber-400' : 'hover:bg-black/5 text-navy-500 hover:text-teal-500'
         }`}
         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       >
@@ -61,11 +61,15 @@ export default function Login() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-xl shadow-primary-500/30">
-            <Hexagon size={30} className="text-white" />
+          <div className="flex items-center justify-center w-14 h-14 rounded-2xl overflow-hidden shadow-xl" style={{ boxShadow: isDark ? '0 8px 24px rgba(76, 183, 158, 0.2)' : '0 8px 24px rgba(76, 183, 158, 0.15)' }}>
+            <img
+              src={isDark ? '/logo-dark.svg' : '/logo-light.svg'}
+              alt="Algeo Verify"
+              className="w-14 h-14 object-cover"
+            />
           </div>
           <div>
-            <h1 className={`text-2xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-dark-900'}`}>Algeo-Verify</h1>
+            <h1 className={`text-2xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-navy-900'}`}>Algeo-Verify</h1>
             <p className="text-sm t-muted">Admin Dashboard</p>
           </div>
         </div>
@@ -73,7 +77,7 @@ export default function Login() {
         {/* Card */}
         <div className="glass-card p-8 shadow-2xl">
           <div className="text-center mb-8">
-            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-dark-900'}`}>Welcome back</h2>
+            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-navy-900'}`}>Welcome back</h2>
             <p className="text-sm t-muted mt-1">Sign in to your admin account</p>
           </div>
 

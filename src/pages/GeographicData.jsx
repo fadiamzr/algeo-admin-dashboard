@@ -35,7 +35,7 @@ export default function GeographicData() {
 
   const wilayaColumns = [
     { key: 'id', label: 'ID', render: (v) => <span className="t-faint font-mono text-xs">{v}</span> },
-    { key: 'code', label: 'Code', render: (v) => <span className="px-2 py-0.5 rounded-md bg-primary-500/10 text-primary-600 text-xs font-mono font-medium">{v}</span> },
+    { key: 'code', label: 'Code', render: (v) => <span className="px-2 py-0.5 rounded-md bg-teal-400/10 text-teal-400 text-xs font-mono font-medium">{v}</span> },
     { key: 'name_fr', label: 'Name (FR)', render: (v) => <span className="font-medium t-primary">{v}</span> },
     { key: 'name_en', label: 'Name (EN)', render: (v) => <span className="t-secondary">{v}</span> },
   ];
@@ -63,8 +63,8 @@ export default function GeographicData() {
             onClick={() => setTab('wilayas')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               tab === 'wilayas'
-                ? 'bg-primary-600/20 text-primary-600 border border-primary-500/20'
-                : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+                ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+                : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
             }`}
           >
             <MapPin size={16} /> Wilayas
@@ -74,8 +74,8 @@ export default function GeographicData() {
             onClick={() => setTab('communes')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               tab === 'communes'
-                ? 'bg-primary-600/20 text-primary-600 border border-primary-500/20'
-                : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+                ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+                : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
             }`}
           >
             <Building2 size={16} /> Communes
@@ -91,7 +91,7 @@ export default function GeographicData() {
         <DataTable columns={wilayaColumns} data={wilayaList} searchKeys={['name_fr', 'name_en', 'code']} pageSize={10}
           actions={(row) => (
             <button onClick={(e) => { e.stopPropagation(); openWilayaEdit(row); }}
-              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`} title="Edit">
+              className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`} title="Edit">
               <Pencil size={15} />
             </button>
           )}
@@ -102,7 +102,7 @@ export default function GeographicData() {
         <DataTable columns={communeColumns} data={communeList} searchKeys={['name_fr', 'name_en', 'postalCode']} pageSize={10}
           actions={(row) => (
             <button onClick={(e) => { e.stopPropagation(); openCommuneEdit(row); }}
-              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`} title="Edit">
+              className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`} title="Edit">
               <Pencil size={15} />
             </button>
           )}

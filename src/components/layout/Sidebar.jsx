@@ -9,7 +9,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Hexagon,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -34,19 +33,23 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       }`}
       style={{
         background: isDark
-          ? 'linear-gradient(180deg, #0f172a 0%, #1a1f3a 100%)'
-          : 'linear-gradient(180deg, #ffffff 0%, #f0f2f8 100%)',
-        borderRight: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+          ? 'linear-gradient(180deg, #0F1A2E 0%, #1B2B4A 100%)'
+          : 'linear-gradient(180deg, #ffffff 0%, #E4ECF4 100%)',
+        borderRight: `1px solid ${isDark ? 'rgba(90, 119, 153, 0.12)' : 'rgba(27, 43, 74, 0.08)'}`,
       }}
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shrink-0">
-          <Hexagon size={22} className="text-white" />
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden shrink-0">
+          <img
+            src={isDark ? '/logo-dark.svg' : '/logo-light.svg'}
+            alt="Algeo Verify"
+            className="w-10 h-10 object-cover"
+          />
         </div>
         {!collapsed && (
           <div className="animate-fade-in overflow-hidden">
-            <h1 className={`text-base font-bold tracking-tight ${isDark ? 'text-white' : 'text-dark-900'}`}>Algeo-Verify</h1>
+            <h1 className={`text-base font-bold tracking-tight ${isDark ? 'text-white' : 'text-navy-900'}`}>Algeo-Verify</h1>
             <p className="text-[11px] t-faint font-medium">Admin Dashboard</p>
           </div>
         )}
@@ -66,23 +69,23 @@ export default function Sidebar({ collapsed, setCollapsed }) {
               to={item.path}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
                 isActive
-                  ? 'bg-primary-600/20 text-primary-600'
+                  ? 'bg-teal-400/15 text-teal-400'
                   : isDark
-                    ? 'text-dark-400 hover:text-dark-200 hover:bg-white/5'
-                    : 'text-dark-500 hover:text-dark-800 hover:bg-black/5'
+                    ? 'text-navy-400 hover:text-navy-200 hover:bg-white/5'
+                    : 'text-navy-500 hover:text-navy-800 hover:bg-black/5'
               }`}
-              style={isActive ? { color: isDark ? '#a5b4fc' : '#4f46e5' } : {}}
+              style={isActive ? { color: isDark ? '#6BC7B2' : '#3D9C85' } : {}}
             >
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary-500 rounded-r-full" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-teal-400 rounded-r-full" />
               )}
               <item.icon
                 size={20}
                 className={`shrink-0 ${isActive
-                  ? (isDark ? 'text-primary-400' : 'text-primary-600')
+                  ? (isDark ? 'text-teal-300' : 'text-teal-500')
                   : isDark
-                    ? 'text-dark-500 group-hover:text-dark-300'
-                    : 'text-dark-400 group-hover:text-dark-600'
+                    ? 'text-navy-500 group-hover:text-navy-300'
+                    : 'text-navy-400 group-hover:text-navy-600'
                 }`}
               />
               {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
@@ -96,7 +99,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 text-sm ${
-            isDark ? 'text-dark-500 hover:text-dark-300 hover:bg-white/5' : 'text-dark-400 hover:text-dark-700 hover:bg-black/5'
+            isDark ? 'text-navy-500 hover:text-navy-300 hover:bg-white/5' : 'text-navy-400 hover:text-navy-700 hover:bg-black/5'
           }`}
         >
           {collapsed ? <ChevronRight size={18} /> : <><ChevronLeft size={18} /><span>Collapse</span></>}

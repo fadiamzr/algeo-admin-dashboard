@@ -43,7 +43,7 @@ export default function Verifications() {
         const bg = v >= 0.8 ? 'bg-emerald-500' : v >= 0.5 ? 'bg-amber-500' : 'bg-red-500';
         return (
           <div className="flex items-center gap-2">
-            <div className={`w-16 h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-dark-700' : 'bg-dark-200'}`}>
+            <div className={`w-16 h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-navy-700' : 'bg-navy-200'}`}>
               <div className={`h-full rounded-full ${bg}`} style={{ width: `${pct}%` }} />
             </div>
             <span className={`text-xs font-semibold ${color}`}>{pct}%</span>
@@ -96,8 +96,8 @@ export default function Verifications() {
             onClick={() => setFilter(tab.key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === tab.key
-                ? 'bg-primary-600/20 text-primary-600 border border-primary-500/20'
-                : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+                ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+                : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
             }`}
           >
             {tab.label}
@@ -115,7 +115,7 @@ export default function Verifications() {
         actions={(row) => (
           <button
             onClick={(e) => { e.stopPropagation(); setSelectedVerification(row); }}
-            className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
+            className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
             title="View details"
           >
             <Eye size={16} />

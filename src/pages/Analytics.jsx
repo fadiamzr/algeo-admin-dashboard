@@ -9,12 +9,12 @@ import {
 function useChartColors() {
   const { isDark } = useTheme();
   return {
-    grid: isDark ? 'rgba(148,163,184,0.08)' : 'rgba(0,0,0,0.06)',
-    tick: isDark ? '#64748b' : '#6b7280',
-    legend: isDark ? '#94a3b8' : '#4b5563',
-    tooltipBg: isDark ? 'rgba(30,41,59,0.95)' : 'rgba(255,255,255,0.97)',
-    tooltipBorder: isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.1)',
-    tooltipText: isDark ? '#cbd5e1' : '#1e293b',
+    grid: isDark ? 'rgba(90,119,153,0.1)' : 'rgba(27,43,74,0.06)',
+    tick: isDark ? '#3B5576' : '#8FA5BF',
+    legend: isDark ? '#5A7799' : '#5A7799',
+    tooltipBg: isDark ? 'rgba(27,43,74,0.95)' : 'rgba(255,255,255,0.97)',
+    tooltipBorder: isDark ? 'rgba(90,119,153,0.15)' : 'rgba(27,43,74,0.08)',
+    tooltipText: isDark ? '#C0D0E0' : '#1B2B4A',
   };
 }
 
@@ -107,8 +107,8 @@ export default function Analytics() {
               <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
-              <Line type="monotone" dataKey="verifications" stroke="#6366f1" strokeWidth={2.5} dot={{ fill: '#6366f1', r: 4 }} name="Verifications" />
-              <Line type="monotone" dataKey="deliveries" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', r: 4 }} name="Deliveries" />
+              <Line type="monotone" dataKey="verifications" stroke="#4CB79E" strokeWidth={2.5} dot={{ fill: '#4CB79E', r: 4 }} name="Verifications" />
+              <Line type="monotone" dataKey="deliveries" stroke="#3B82F6" strokeWidth={2.5} dot={{ fill: '#3B82F6', r: 4 }} name="Deliveries" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -121,8 +121,8 @@ export default function Analytics() {
             <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis type="category" dataKey="wilaya" tick={{ fill: cc.legend, fontSize: 12 }} axisLine={false} tickLine={false} width={100} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" fill="#6366f1" radius={[0, 8, 8, 0]} barSize={22} name="Verifications">
-              {verificationsByWilaya.map((_, idx) => (<Cell key={idx} fill={`hsl(${240 + idx * 12}, 70%, ${55 + idx * 2}%)`} />))}
+            <Bar dataKey="count" fill="#4CB79E" radius={[0, 8, 8, 0]} barSize={22} name="Verifications">
+              {verificationsByWilaya.map((_, idx) => (<Cell key={idx} fill={`hsl(${160 + idx * 8}, 50%, ${40 + idx * 3}%)`} />))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>

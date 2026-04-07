@@ -56,7 +56,7 @@ export default function Agents() {
       label: 'Agent',
       render: (v, row) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400/30 to-primary-600/30 flex items-center justify-center text-primary-600 text-sm font-semibold border border-primary-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-300/30 to-teal-500/30 flex items-center justify-center text-teal-400 text-sm font-semibold border border-teal-400/20">
             {v.charAt(0)}
           </div>
           <div>
@@ -113,7 +113,7 @@ export default function Agents() {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); openEdit(row); }}
-              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
+              className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
               title="Edit"
             >
               <Pencil size={15} />

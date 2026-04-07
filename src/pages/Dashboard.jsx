@@ -19,12 +19,12 @@ import {
 function useChartColors() {
   const { isDark } = useTheme();
   return {
-    grid: isDark ? 'rgba(148,163,184,0.08)' : 'rgba(0,0,0,0.06)',
-    tick: isDark ? '#64748b' : '#94a3b8',
-    legend: isDark ? '#94a3b8' : '#64748b',
-    tooltipBg: isDark ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.95)',
-    tooltipBorder: isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.08)',
-    tooltipText: isDark ? '#cbd5e1' : '#334155',
+    grid: isDark ? 'rgba(90,119,153,0.1)' : 'rgba(27,43,74,0.06)',
+    tick: isDark ? '#3B5576' : '#8FA5BF',
+    legend: isDark ? '#5A7799' : '#5A7799',
+    tooltipBg: isDark ? 'rgba(27,43,74,0.9)' : 'rgba(255,255,255,0.95)',
+    tooltipBorder: isDark ? 'rgba(90,119,153,0.15)' : 'rgba(27,43,74,0.08)',
+    tooltipText: isDark ? '#C0D0E0' : '#1B2B4A',
   };
 }
 
@@ -102,12 +102,12 @@ export default function Dashboard() {
             <AreaChart data={monthlyTrends}>
               <defs>
                 <linearGradient id="colorVerif" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#4CB79E" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#4CB79E" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="colorDeliv" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={cc.grid} />
@@ -115,8 +115,8 @@ export default function Dashboard() {
               <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
-              <Area type="monotone" dataKey="verifications" stroke="#6366f1" fill="url(#colorVerif)" strokeWidth={2} name="Verifications" />
-              <Area type="monotone" dataKey="deliveries" stroke="#10b981" fill="url(#colorDeliv)" strokeWidth={2} name="Deliveries" />
+              <Area type="monotone" dataKey="verifications" stroke="#4CB79E" fill="url(#colorVerif)" strokeWidth={2} name="Verifications" />
+              <Area type="monotone" dataKey="deliveries" stroke="#3B82F6" fill="url(#colorDeliv)" strokeWidth={2} name="Deliveries" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -156,7 +156,7 @@ export default function Dashboard() {
               <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="wilaya" tick={{ fill: cc.legend, fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill="#6366f1" radius={[0, 6, 6, 0]} barSize={18} name="Verifications" />
+              <Bar dataKey="count" fill="#4CB79E" radius={[0, 6, 6, 0]} barSize={18} name="Verifications" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

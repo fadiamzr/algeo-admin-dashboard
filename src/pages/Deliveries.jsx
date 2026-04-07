@@ -92,8 +92,8 @@ export default function Deliveries() {
             onClick={() => setStatusFilter(tab.key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               statusFilter === tab.key
-                ? 'bg-primary-600/20 text-primary-600 border border-primary-500/20'
-                : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+                ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+                : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
             }`}
           >
             {tab.label}
@@ -111,7 +111,7 @@ export default function Deliveries() {
         actions={(row) => (
           <button
             onClick={(e) => { e.stopPropagation(); setSelectedDelivery(row); }}
-            className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
+            className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
             title="View details"
           >
             <Eye size={16} />

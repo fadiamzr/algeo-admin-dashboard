@@ -12,12 +12,12 @@ import {
 function useChartColors() {
   const { isDark } = useTheme();
   return {
-    grid: isDark ? 'rgba(148,163,184,0.08)' : 'rgba(0,0,0,0.06)',
-    tick: isDark ? '#64748b' : '#6b7280',
-    legend: isDark ? '#94a3b8' : '#4b5563',
-    tooltipBg: isDark ? 'rgba(30,41,59,0.95)' : 'rgba(255,255,255,0.97)',
-    tooltipBorder: isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.1)',
-    tooltipText: isDark ? '#cbd5e1' : '#1e293b',
+    grid: isDark ? 'rgba(90,119,153,0.1)' : 'rgba(27,43,74,0.06)',
+    tick: isDark ? '#3B5576' : '#8FA5BF',
+    legend: isDark ? '#5A7799' : '#5A7799',
+    tooltipBg: isDark ? 'rgba(27,43,74,0.95)' : 'rgba(255,255,255,0.97)',
+    tooltipBorder: isDark ? 'rgba(90,119,153,0.15)' : 'rgba(27,43,74,0.08)',
+    tooltipText: isDark ? '#C0D0E0' : '#1B2B4A',
   };
 }
 
@@ -100,8 +100,8 @@ export default function SystemLogs() {
           onClick={() => setTab('api')}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
             tab === 'api'
-              ? 'bg-primary-600/20 text-primary-600 border border-primary-500/20'
-              : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+              ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+              : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
           }`}
         >
           <Server size={16} /> API Usage
@@ -112,7 +112,7 @@ export default function SystemLogs() {
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
             tab === 'errors'
               ? 'bg-red-600/20 text-red-600 border border-red-500/20'
-              : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+              : `t-muted border border-transparent ${isDark ? 'hover:text-navy-200 hover:bg-white/5' : 'hover:text-navy-900 hover:bg-black/5'}`
           }`}
         >
           <AlertCircle size={16} /> Error Logs
@@ -129,7 +129,7 @@ export default function SystemLogs() {
               <XAxis type="number" tick={{ fill: cc.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="endpoint" tick={{ fill: cc.legend, fontSize: 10 }} axisLine={false} tickLine={false} width={140} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="requests" fill="#6366f1" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
+              <Bar dataKey="requests" fill="#4CB79E" radius={[0, 6, 6, 0]} barSize={16} name="Requests" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -142,7 +142,7 @@ export default function SystemLogs() {
               <YAxis tick={{ fill: cc.tick, fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: 12, color: cc.legend }} />
-              <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} name="Total Requests" />
+              <Line type="monotone" dataKey="total" stroke="#4CB79E" strokeWidth={2} dot={{ fill: '#4CB79E', r: 3 }} name="Total Requests" />
               <Line type="monotone" dataKey="errors" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Errors" />
             </LineChart>
           </ResponsiveContainer>
