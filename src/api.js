@@ -41,14 +41,14 @@ export async function apiLogin(email, password) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || 'Invalid credentials');
   }
-  return res.json();
+  return res.json(); // { access_token }
 }
 
 export async function apiGetMe() {
   return apiFetch('/auth/me');
 }
 
-// ─── Admin Statistics (Dashboard) ────────────────────────────────────────────
+// ─── Admin Statistics ─────────────────────────────────────────────────────────
 export async function apiGetStatistics() {
   return apiFetch('/api/admin/statistics');
 }
@@ -70,35 +70,14 @@ export async function apiGetVerifications(page = 1, pageSize = 20, filter = 'all
   return apiFetch(`/api/admin/verifications?page=${page}&page_size=${pageSize}&filter=${filter}`);
 }
 
-export async function apiGetVerification(id) {
-  return apiFetch(`/api/admin/verifications/${id}`);
-}
-
 // ─── Deliveries ───────────────────────────────────────────────────────────────
-export async function apiGetDeliveries(page = 1, pageSize = 20, status = 'all') {
-  const statusParam = status !== 'all' ? `&status=${status}` : '';
-  return apiFetch(`/api/admin/deliveries?page=${page}&page_size=${pageSize}${statusParam}`);
-}
-
-export async function apiGetDelivery(id) {
-  return apiFetch(`/api/admin/deliveries/${id}`);
+export async function apiGetDeliveries(page = 1, pageSize = 20) {
+  return apiFetch(`/api/admin/deliveries?page=${page}&page_size=${pageSize}`);
 }
 
 // ─── Agents ───────────────────────────────────────────────────────────────────
 export async function apiGetAgents() {
   return apiFetch('/api/admin/agents');
-}
-
-export async function apiCreateAgent(userId) {
-  return apiFetch(`/api/admin/agents?user_id=${userId}`, { method: 'POST' });
-}
-
-export async function apiUpdateAgent(agentId, companyId) {
-  return apiFetch(`/api/admin/agents/${agentId}?company_id=${companyId}`, { method: 'PUT' });
-}
-
-export async function apiDeleteAgent(agentId) {
-  return apiFetch(`/api/admin/agents/${agentId}`, { method: 'DELETE' });
 }
 
 // ─── Logs ─────────────────────────────────────────────────────────────────────
@@ -110,21 +89,7 @@ export async function apiGetErrorRate() {
   return apiFetch('/api/admin/logs/error-rate');
 }
 
-export async function apiGetRequestsPerEndpoint() {
-  return apiFetch('/api/admin/logs/requests-per-endpoint');
-}
-
 // ─── Analytics ────────────────────────────────────────────────────────────────
 export async function apiGetScoreDistribution() {
   return apiFetch('/api/admin/analytics/score-distribution');
-}
-
-// ─── Geographic ───────────────────────────────────────────────────────────────
-export async function apiGetWilayas() {
-  return apiFetch('/api/wilayas');
-}
-
-export async function apiGetCommunes(wilayaId) {
-  const param = wilayaId ? `?wilaya_id=${wilayaId}` : '';
-  return apiFetch(`/api/communes${param}`);
 }
