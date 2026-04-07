@@ -1,40 +1,52 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiLogin, apiGetMe, setToken, removeToken, getToken } from '../api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const stored = sessionStorage.getItem('algeo_user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // On startup, check if token exists and fetch current user
   useEffect(() => {
-    if (user) {
-      sessionStorage.setItem('algeo_user', JSON.stringify(user));
+    const token = getToken();
+    if (token) {
+      apiGetMe()
+        .then((me) => setUser(me))
+        .catch(() => {
+          removeToken();
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
     } else {
-      sessionStorage.removeItem('algeo_user');
+      setLoading(false);
     }
-  }, [user]);
+  }, []);
 
-  const login = (email, password) => {
-    // Mock authentication
-    if (email && password) {
-      const mockUser = {
-        id: 'u1',
-        name: 'Yacine Benmoussa',
-        email: email,
-        role: 'admin',
-        createdAt: '2025-01-15',
-      };
-      setUser(mockUser);
-      return { success: true, user: mockUser };
+  const login = async (email, password) => {
+    try {
+      const data = await apiLogin(email, password);
+      setToken(data.access_token);
+      const me = await apiGetMe();
+      setUser(me);
+      return { success: true, user: me };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    return { success: false, error: 'Invalid credentials' };
   };
 
   const logout = () => {
+    removeToken();
     setUser(null);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>

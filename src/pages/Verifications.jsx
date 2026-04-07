@@ -1,22 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
-import { addressVerifications, verificationRecords } from '../mockData';
 import { Eye, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { apiGetVerifications } from '../api';
 
 export default function Verifications() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedVerification, setSelectedVerification] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const { isDark } = useTheme();
 
-  const filteredData = addressVerifications.filter((v) => {
-    if (filter === 'high') return v.confidenceScore >= 0.8;
-    if (filter === 'medium') return v.confidenceScore >= 0.5 && v.confidenceScore < 0.8;
-    if (filter === 'low') return v.confidenceScore < 0.5;
-    if (filter === 'risky') return v.riskFlags.length > 0;
-    return true;
-  });
+  useEffect(() => {
+    setLoading(true);
+    apiGetVerifications(page, 20, filter)
+      .then((res) => {
+        setData(res.items || []);
+        setTotal(res.total || 0);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [filter, page]);
 
   const columns = [
     {
@@ -25,17 +33,17 @@ export default function Verifications() {
       render: (v) => <span className="t-faint font-mono text-xs">{v}</span>,
     },
     {
-      key: 'rawAddress',
+      key: 'raw_address',
       label: 'Raw Address',
       render: (v) => <span className="truncate max-w-[200px] block font-medium t-primary">{v}</span>,
     },
     {
-      key: 'normalizedAddress',
+      key: 'normalized_address',
       label: 'Normalized',
       render: (v) => <span className="truncate max-w-[220px] block t-secondary">{v || '—'}</span>,
     },
     {
-      key: 'confidenceScore',
+      key: 'confidence_score',
       label: 'Score',
       render: (v) => {
         const pct = (v * 100).toFixed(0);
@@ -52,39 +60,47 @@ export default function Verifications() {
       },
     },
     {
-      key: 'riskFlags',
-      label: 'Risk Flags',
+      key: 'match_details',
+      label: 'Match',
       render: (v) =>
-        v?.length > 0 ? (
+        v ? (
           <div className="flex items-center gap-1">
-            <AlertTriangle size={14} className="text-amber-500" />
-            <span className="text-xs text-amber-500">{v.length} flag{v.length > 1 ? 's' : ''}</span>
+            <CheckCircle size={14} className="text-emerald-500" />
+            <span className="text-xs text-emerald-500 truncate max-w-[120px]">{v}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1">
-            <CheckCircle size={14} className="text-emerald-500" />
-            <span className="text-xs text-emerald-500">Clean</span>
+            <AlertTriangle size={14} className="text-amber-500" />
+            <span className="text-xs text-amber-500">No match</span>
           </div>
         ),
     },
     {
-      key: 'createdAt',
+      key: 'created_at',
       label: 'Date',
       render: (v) => <span className="t-muted text-xs">{new Date(v).toLocaleDateString()}</span>,
     },
   ];
 
-  const relatedRecords = selectedVerification
-    ? verificationRecords.filter((r) => r.verificationId === selectedVerification.id)
-    : [];
-
   const filterTabs = [
-    { key: 'all', label: 'All', count: addressVerifications.length },
-    { key: 'high', label: 'High Score', count: addressVerifications.filter((v) => v.confidenceScore >= 0.8).length },
-    { key: 'medium', label: 'Medium', count: addressVerifications.filter((v) => v.confidenceScore >= 0.5 && v.confidenceScore < 0.8).length },
-    { key: 'low', label: 'Low Score', count: addressVerifications.filter((v) => v.confidenceScore < 0.5).length },
-    { key: 'risky', label: 'Risky', count: addressVerifications.filter((v) => v.riskFlags.length > 0).length },
+    { key: 'all', label: 'All' },
+    { key: 'high', label: 'High Score' },
+    { key: 'medium', label: 'Medium' },
+    { key: 'low', label: 'Low Score' },
+    { key: 'risky', label: 'Risky' },
   ];
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="flex items-center justify-center h-64">
+      <p className="text-red-500">Error: {error}</p>
+    </div>
+  );
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -93,7 +109,7 @@ export default function Verifications() {
         {filterTabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setFilter(tab.key)}
+            onClick={() => { setFilter(tab.key); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === tab.key
                 ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
@@ -101,17 +117,17 @@ export default function Verifications() {
             }`}
           >
             {tab.label}
-            <span className="ml-1.5 text-xs opacity-60">({tab.count})</span>
           </button>
         ))}
+        <span className="ml-auto text-xs t-muted">{total} total</span>
       </div>
 
       {/* Table */}
       <DataTable
         columns={columns}
-        data={filteredData}
-        searchKeys={['rawAddress', 'normalizedAddress', 'id']}
-        pageSize={8}
+        data={data}
+        searchKeys={['raw_address', 'normalized_address']}
+        pageSize={20}
         actions={(row) => (
           <button
             onClick={(e) => { e.stopPropagation(); setSelectedVerification(row); }}
@@ -132,74 +148,36 @@ export default function Verifications() {
       >
         {selectedVerification && (
           <div className="space-y-5">
-            {/* Address Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-medium t-faint uppercase">Raw Address</label>
-                <p className="text-sm t-primary mt-1">{selectedVerification.rawAddress}</p>
+                <p className="text-sm t-primary mt-1">{selectedVerification.raw_address}</p>
               </div>
               <div>
                 <label className="text-xs font-medium t-faint uppercase">Normalized Address</label>
-                <p className="text-sm t-primary mt-1">{selectedVerification.normalizedAddress || '—'}</p>
+                <p className="text-sm t-primary mt-1">{selectedVerification.normalized_address || '—'}</p>
               </div>
             </div>
 
-            {/* Score & Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="glass-card-light p-4">
                 <label className="text-xs font-medium t-faint uppercase">Confidence Score</label>
                 <p className={`text-2xl font-bold mt-1 ${
-                  selectedVerification.confidenceScore >= 0.8 ? 'text-emerald-500' :
-                  selectedVerification.confidenceScore >= 0.5 ? 'text-amber-500' : 'text-red-500'
+                  selectedVerification.confidence_score >= 0.8 ? 'text-emerald-500' :
+                  selectedVerification.confidence_score >= 0.5 ? 'text-amber-500' : 'text-red-500'
                 }`}>
-                  {(selectedVerification.confidenceScore * 100).toFixed(0)}%
+                  {(selectedVerification.confidence_score * 100).toFixed(0)}%
                 </p>
               </div>
               <div className="glass-card-light p-4">
                 <label className="text-xs font-medium t-faint uppercase">Match Details</label>
-                <p className="text-sm t-secondary mt-1">{selectedVerification.matchDetails}</p>
+                <p className="text-sm t-secondary mt-1">{selectedVerification.match_details || '—'}</p>
               </div>
               <div className="glass-card-light p-4">
                 <label className="text-xs font-medium t-faint uppercase">Created At</label>
-                <p className="text-sm t-secondary mt-1">{new Date(selectedVerification.createdAt).toLocaleString()}</p>
+                <p className="text-sm t-secondary mt-1">{new Date(selectedVerification.created_at).toLocaleString()}</p>
               </div>
             </div>
-
-            {/* Risk Flags */}
-            {selectedVerification.riskFlags.length > 0 && (
-              <div>
-                <label className="text-xs font-medium t-faint uppercase mb-2 block">Risk Flags</label>
-                <div className="flex flex-wrap gap-2">
-                  {selectedVerification.riskFlags.map((flag, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 text-xs font-medium border border-amber-500/20">
-                      {flag.replace(/_/g, ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Verification Records */}
-            {relatedRecords.length > 0 && (
-              <div>
-                <label className="text-xs font-medium t-faint uppercase mb-2 block">Verification Records</label>
-                <div className="space-y-2">
-                  {relatedRecords.map((rec) => (
-                    <div key={rec.id} className="glass-card-light p-3 flex items-center justify-between">
-                      <div>
-                        <span className="text-xs t-faint font-mono">{rec.id}</span>
-                        <p className="text-sm t-secondary">{rec.verificationDate}</p>
-                      </div>
-                      <span className={`text-sm font-semibold ${
-                        rec.resultScore >= 0.8 ? 'text-emerald-500' : rec.resultScore >= 0.5 ? 'text-amber-500' : 'text-red-500'
-                      }`}>
-                        {(rec.resultScore * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </Modal>

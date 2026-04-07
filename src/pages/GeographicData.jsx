@@ -1,36 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
-import Modal from '../components/ui/Modal';
-import { wilayas, communes } from '../mockData';
+import ChartCard from '../components/charts/ChartCard';
 import { useTheme } from '../contexts/ThemeContext';
-import { Plus, Pencil, MapPin, Building2, Save } from 'lucide-react';
+import { MapPin } from 'lucide-react';
+import { apiGetVerificationsByWilaya } from '../api';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts';
 
 export default function GeographicData() {
-  const [tab, setTab] = useState('wilayas');
-  const [wilayaList, setWilayaList] = useState(wilayas);
-  const [communeList, setCommuneList] = useState(communes);
-  const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [wilayaForm, setWilayaForm] = useState({ code: '', name_fr: '', name_en: '' });
-  const [communeForm, setCommuneForm] = useState({ name_fr: '', name_en: '', postalCode: '', wilayaId: '' });
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { isDark } = useTheme();
 
-  const openWilayaCreate = () => { setEditing(null); setWilayaForm({ code: '', name_fr: '', name_en: '' }); setShowModal(true); };
-  const openWilayaEdit = (w) => { setEditing(w); setWilayaForm({ code: w.code, name_fr: w.name_fr, name_en: w.name_en }); setShowModal(true); };
-  const saveWilaya = () => {
-    if (!wilayaForm.code || !wilayaForm.name_fr) return;
-    if (editing) { setWilayaList((prev) => prev.map((w) => w.id === editing.id ? { ...w, ...wilayaForm } : w)); }
-    else { setWilayaList((prev) => [...prev, { id: prev.length + 1, ...wilayaForm }]); }
-    setShowModal(false);
+  const cc = {
+    grid: isDark ? 'rgba(148,163,184,0.08)' : 'rgba(0,0,0,0.06)',
+    tick: isDark ? '#64748b' : '#6b7280',
+    legend: isDark ? '#94a3b8' : '#4b5563',
+    tooltipBg: isDark ? 'rgba(30,41,59,0.95)' : 'rgba(255,255,255,0.97)',
+    tooltipBorder: isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.1)',
+    tooltipText: isDark ? '#cbd5e1' : '#1e293b',
   };
 
-  const openCommuneCreate = () => { setEditing(null); setCommuneForm({ name_fr: '', name_en: '', postalCode: '', wilayaId: '' }); setShowModal(true); };
-  const openCommuneEdit = (c) => { setEditing(c); setCommuneForm({ name_fr: c.name_fr, name_en: c.name_en, postalCode: String(c.postalCode), wilayaId: String(c.wilayaId) }); setShowModal(true); };
-  const saveCommune = () => {
-    if (!communeForm.name_fr || !communeForm.postalCode) return;
-    if (editing) { setCommuneList((prev) => prev.map((c) => c.id === editing.id ? { ...c, ...communeForm, postalCode: Number(communeForm.postalCode), wilayaId: Number(communeForm.wilayaId) } : c)); }
-    else { setCommuneList((prev) => [...prev, { id: prev.length + 1, ...communeForm, postalCode: Number(communeForm.postalCode), wilayaId: Number(communeForm.wilayaId) }]); }
-    setShowModal(false);
+  useEffect(() => {
+    apiGetVerificationsByWilaya()
+      .then((res) => setData(res))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="px-3 py-2 text-xs rounded-xl shadow-xl"
+        style={{ background: cc.tooltipBg, border: `1px solid ${cc.tooltipBorder}` }}>
+        <p className="font-medium mb-1" style={{ color: cc.tooltipText }}>{label}</p>
+        <p style={{ color: '#6366f1' }} className="font-medium">
+          Verifications: {payload[0].value}
+        </p>
+      </div>
+    );
   };
 
   const wilayaColumns = [
@@ -46,14 +56,51 @@ export default function GeographicData() {
     { key: 'name_en', label: 'Name (EN)', render: (v) => <span className="t-secondary">{v}</span> },
     { key: 'postalCode', label: 'Postal Code', render: (v) => <span className="font-mono t-secondary text-sm">{v}</span> },
     {
-      key: 'wilayaId',
+      key: 'wilaya',
       label: 'Wilaya',
-      render: (v) => {
-        const w = wilayaList.find((w) => w.id === v);
-        return <span className="t-muted text-sm">{w?.name_fr || '—'}</span>;
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <MapPin size={14} className="text-primary-500" />
+          <span className="font-medium t-primary">{v}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'count',
+      label: 'Verifications',
+      render: (v, row) => {
+        const max = data[0]?.count || 1;
+        const pct = (v / max) * 100;
+        return (
+          <div className="flex items-center gap-3">
+            <div className={`w-24 h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-dark-700' : 'bg-dark-200'}`}>
+              <div className="h-full rounded-full bg-primary-500" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="font-semibold t-primary text-sm">{v}</span>
+          </div>
+        );
       },
     },
   ];
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="flex items-center justify-center h-64">
+      <p className="text-red-500">Error: {error}</p>
+    </div>
+  );
+
+  if (data.length === 0) return (
+    <div className="flex flex-col items-center justify-center h-64 gap-3">
+      <MapPin size={40} className="t-faint" />
+      <p className="t-muted">No geographic data yet. Start verifying addresses!</p>
+    </div>
+  );
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -82,9 +129,6 @@ export default function GeographicData() {
             <span className="text-xs opacity-60">({communeList.length})</span>
           </button>
         </div>
-        <button onClick={tab === 'wilayas' ? openWilayaCreate : openCommuneCreate} className="btn-primary">
-          <Plus size={16} /> Add {tab === 'wilayas' ? 'Wilaya' : 'Commune'}
-        </button>
       </div>
 
       {tab === 'wilayas' && (
