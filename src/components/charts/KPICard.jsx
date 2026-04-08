@@ -5,7 +5,7 @@ export default function KPICard({ title, value, subtitle, icon: Icon, trend, tre
   const { isDark } = useTheme();
 
   const colorMap = {
-    primary: { bg: 'from-primary-500/20 to-primary-600/10', icon: 'text-primary-400', border: 'border-primary-500/20' },
+    primary: { bg: 'from-teal-400/20 to-teal-500/10', icon: 'text-teal-300', border: 'border-teal-400/20' },
     success: { bg: 'from-emerald-500/20 to-emerald-600/10', icon: 'text-emerald-400', border: 'border-emerald-500/20' },
     warning: { bg: 'from-amber-500/20 to-amber-600/10', icon: 'text-amber-400', border: 'border-amber-500/20' },
     danger: { bg: 'from-red-500/20 to-red-600/10', icon: 'text-red-400', border: 'border-red-500/20' },
@@ -13,7 +13,7 @@ export default function KPICard({ title, value, subtitle, icon: Icon, trend, tre
   };
 
   const lightColorMap = {
-    primary: { bg: 'from-primary-50 to-primary-100/50', icon: 'text-primary-600', border: 'border-primary-200' },
+    primary: { bg: 'from-teal-50 to-teal-100/50', icon: 'text-teal-600', border: 'border-teal-200' },
     success: { bg: 'from-emerald-50 to-emerald-100/50', icon: 'text-emerald-600', border: 'border-emerald-200' },
     warning: { bg: 'from-amber-50 to-amber-100/50', icon: 'text-amber-600', border: 'border-amber-200' },
     danger: { bg: 'from-red-50 to-red-100/50', icon: 'text-red-600', border: 'border-red-200' },
@@ -30,7 +30,7 @@ export default function KPICard({ title, value, subtitle, icon: Icon, trend, tre
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="text-xs font-medium t-muted uppercase tracking-wider">{title}</p>
-          <h3 className={`text-2xl font-bold mt-1 ${isDark ? 'text-white' : 'text-dark-900'}`}>{value}</h3>
+          <h3 className={`text-2xl font-bold mt-1 ${isDark ? 'text-white' : 'text-navy-900'}`}>{value}</h3>
         </div>
         <div className={`p-2.5 rounded-xl ${isDark ? 'bg-white/5' : 'bg-white/80'} ${c.icon}`}>
           {Icon && <Icon size={22} />}

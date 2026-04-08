@@ -75,6 +75,13 @@ export async function apiGetDeliveries(page = 1, pageSize = 20) {
   return apiFetch(`/api/admin/deliveries?page=${page}&page_size=${pageSize}`);
 }
 
+export async function getDeliveryMapData(status = null) {
+  const params = new URLSearchParams();
+  if (status) params.append('status', status);
+  const query = params.toString() ? `?${params}` : '';
+  return apiFetch(`/api/admin/deliveries/map${query}`);
+}
+
 // ─── Agents ───────────────────────────────────────────────────────────────────
 export async function apiGetAgents() {
   return apiFetch('/api/admin/agents');
@@ -98,6 +105,10 @@ export async function apiGetLogs(limit = 100) {
 
 export async function apiGetErrorRate() {
   return apiFetch('/api/admin/logs/error-rate');
+}
+
+export async function apiGetRequestsPerEndpoint() {
+  return apiFetch('/api/admin/logs/requests-per-endpoint');
 }
 
 // ─── Analytics ────────────────────────────────────────────────────────────────
