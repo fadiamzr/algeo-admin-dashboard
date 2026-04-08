@@ -79,7 +79,18 @@ export async function apiGetDeliveries(page = 1, pageSize = 20) {
 export async function apiGetAgents() {
   return apiFetch('/api/admin/agents');
 }
+export async function apiCreateAgent(userId) {
+  return apiFetch(`/api/admin/agents?user_id=${userId}`, { method: 'POST' });
+}
 
+export async function apiUpdateAgent(agentId, companyId) {
+  const query = companyId !== null ? `?company_id=${companyId}` : '';
+  return apiFetch(`/api/admin/agents/${agentId}${query}`, { method: 'PUT' });
+}
+
+export async function apiDeleteAgent(agentId) {
+  return apiFetch(`/api/admin/agents/${agentId}`, { method: 'DELETE' });
+}
 // ─── Logs ─────────────────────────────────────────────────────────────────────
 export async function apiGetLogs(limit = 100) {
   return apiFetch(`/api/admin/logs?limit=${limit}`);
