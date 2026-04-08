@@ -158,8 +158,8 @@ export default function Deliveries() {
               key={tab.key}
               onClick={() => setStatusFilter(tab.key)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${statusFilter === tab.key
-                  ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
-                  : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
+                ? 'bg-teal-400/15 text-teal-400 border border-teal-400/20'
+                : `t-muted border border-transparent ${isDark ? 'hover:text-dark-200 hover:bg-white/5' : 'hover:text-dark-900 hover:bg-black/5'}`
                 }`}
             >
               {tab.label}
@@ -200,8 +200,8 @@ export default function Deliveries() {
       {/* Import Result */}
       {importResult && (
         <div className={`p-4 rounded-xl text-sm ${importResult.errors?.length > 0
-            ? 'bg-amber-500/10 border border-amber-500/20 text-amber-500'
-            : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
+          ? 'bg-amber-500/10 border border-amber-500/20 text-amber-500'
+          : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
           }`}>
           <p className="font-medium">{importResult.message} — {importResult.created} deliveries added</p>
           {importResult.errors?.length > 0 && (
