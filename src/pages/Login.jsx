@@ -5,8 +5,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@algeo.dz');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('test@test.com');
+  const [password, setPassword] = useState('test123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -20,7 +20,7 @@ export default function Login() {
 
     await new Promise((r) => setTimeout(r, 800));
 
-    const result = login(email, password);
+    const result = await login(email, password);
     if (result.success) {
       navigate('/');
     } else {
