@@ -10,6 +10,7 @@ import Agents from './pages/Agents';
 import GeographicData from './pages/GeographicData';
 import Analytics from './pages/Analytics';
 import SystemLogs from './pages/SystemLogs';
+import DeliveryMap from './pages/DeliveryMap';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -47,6 +48,7 @@ function AppRoutes() {
         <Route path="geographic" element={<GeographicData />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="logs" element={<SystemLogs />} />
+        <Route path="map" element={<DeliveryMap />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
