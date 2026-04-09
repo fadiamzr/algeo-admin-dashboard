@@ -3,6 +3,7 @@ import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
 import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
+import { apiGetAgents, apiCreateAgent, apiUpdateAgent, apiDeleteAgent } from '../api'; // ✅ AJOUTER
 
 export default function Agents() {
   const [agents, setAgents] = useState([]);
@@ -71,18 +72,7 @@ export default function Agents() {
     {
       key: 'user_id',
       label: 'User ID',
-      render: (v) => (
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-300/30 to-teal-500/30 flex items-center justify-center text-teal-400 text-sm font-semibold border border-teal-400/20">
-            {v.charAt(0)}
-          </div>
-          <div>
-            <p className="font-medium t-primary text-sm">{v}</p>
-            <p className="text-xs t-faint">{row.email}</p>
-          </div>
-          <span className="font-mono t-secondary text-sm">User #{v}</span>
-        </div>
-      ),
+      render: (v) => <span className="font-mono t-secondary text-sm">User #{v}</span>,
     },
     {
       key: 'company_id',
