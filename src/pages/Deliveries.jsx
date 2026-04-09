@@ -1,25 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DataTable from '../components/tables/DataTable';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
-import { Eye, Download } from 'lucide-react';
+import { Eye, Download, Upload } from 'lucide-react';
 import { apiGetDeliveries } from '../api';
 
 function exportCSV(data) {
   const headers = [
-    'address',
-    'status',
-    'scheduled_date',
-    'delivery_agent_id',
-    'normalized_address',
-    'latitude',
-    'longitude',
-    'confidence_score',
-    'ai_preprocessed',
-    'geocoding_status',
+    'address', 'status', 'scheduled_date', 'delivery_agent_id',
+    'normalized_address', 'latitude', 'longitude', 'confidence_score',
+    'ai_preprocessed', 'geocoding_status',
   ];
-
   const rows = data.map((d) => [
     `"${d.raw_address || ''}"`,
     d.status || '',
@@ -32,7 +24,6 @@ function exportCSV(data) {
     d.ai_preprocessed ? 'true' : 'false',
     d.geocoding_status || '',
   ]);
-
   const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -49,14 +40,50 @@ export default function Deliveries() {
   const [error, setError] = useState(null);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+  const fileInputRef = useRef(null);
   const { isDark } = useTheme();
 
-  useEffect(() => {
+  const fetchDeliveries = () => {
+    setLoading(true);
     apiGetDeliveries(1, 100)
       .then((res) => setData(res.items || []))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDeliveries();
   }, []);
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImporting(true);
+    setImportResult(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const token = localStorage.getItem('algeo_token');
+      const res = await fetch('http://127.0.0.1:8000/api/admin/deliveries/import', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const result = await res.json();
+      setImportResult(result);
+      fetchDeliveries();
+    } catch (err) {
+      setImportResult({ message: 'Import failed', created: 0, errors: [err.message] });
+    } finally {
+      setImporting(false);
+      fileInputRef.current.value = '';
+    }
+  };
 
   const filtered = statusFilter === 'all'
     ? data
@@ -129,15 +156,51 @@ export default function Deliveries() {
           ))}
         </div>
 
-        {/* CSV Button */}
-        <button
-          onClick={() => exportCSV(filtered)}
-          className="btn-secondary flex items-center gap-2"
-        >
-          <Download size={15} />
-          Export CSV
-        </button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Import CSV */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleImport}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current.click()}
+            disabled={importing}
+            className="btn-secondary flex items-center gap-2 disabled:opacity-60"
+          >
+            <Upload size={15} />
+            {importing ? 'Importing...' : 'Import CSV'}
+          </button>
+
+          {/* Export CSV */}
+          <button
+            onClick={() => exportCSV(filtered)}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <Download size={15} />
+            Export CSV
+          </button>
+        </div>
       </div>
+
+      {/* Import Result */}
+      {importResult && (
+        <div className={`p-4 rounded-xl text-sm ${
+          importResult.errors?.length > 0
+            ? 'bg-amber-500/10 border border-amber-500/20 text-amber-500'
+            : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
+        }`}>
+          <p className="font-medium">{importResult.message} — {importResult.created} deliveries added</p>
+          {importResult.errors?.length > 0 && (
+            <ul className="mt-2 text-xs space-y-1">
+              {importResult.errors.map((e, i) => <li key={i}>⚠️ {e}</li>)}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Table */}
       <DataTable
