@@ -115,3 +115,11 @@ export async function apiGetRequestsPerEndpoint() {
 export async function apiGetScoreDistribution() {
   return apiFetch('/api/admin/analytics/score-distribution');
 }
+// ─── Geographic Data ──────────────────────────────────────────────────────────
+export async function apiGetWilayas() {
+  return apiFetch('/api/admin/wilayas');
+}
+
+export async function apiGetCommunes() {
+  return apiFetch('/api/admin/communes');
+}
