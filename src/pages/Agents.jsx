@@ -2,8 +2,21 @@ import { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
-import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
-import { apiGetAgents, apiCreateAgent, apiUpdateAgent, apiDeleteAgent } from '../api'; // ✅ AJOUTER
+import { Plus, Pencil, Trash2, UserCheck, Download } from 'lucide-react';
+import { apiGetAgents } from '../api';
+
+function exportCSV(data) {
+  const headers = ['id', 'user_id', 'company_id'];
+  const rows = data.map((a) => [a.id, a.user_id, a.company_id || '']);
+  const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `agents_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function Agents() {
   const [agents, setAgents] = useState([]);
@@ -42,9 +55,15 @@ export default function Agents() {
     if (!form.user_id) return;
     try {
       if (editingAgent) {
-        await apiUpdateAgent(editingAgent.id, form.company_id ? Number(form.company_id) : null);
+        await fetch(`http://127.0.0.1:8000/api/admin/agents/${editingAgent.id}?company_id=${form.company_id}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
+        });
       } else {
-        await apiCreateAgent(Number(form.user_id));
+        await fetch(`http://127.0.0.1:8000/api/admin/agents?user_id=${form.user_id}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
+        });
       }
       fetchAgents();
       setShowModal(false);
@@ -56,7 +75,10 @@ export default function Agents() {
   const handleDelete = async (agent) => {
     if (!confirm(`Delete agent #${agent.id}?`)) return;
     try {
-      await apiDeleteAgent(agent.id);
+      await fetch(`http://127.0.0.1:8000/api/admin/agents/${agent.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
+      });
       fetchAgents();
     } catch (err) {
       alert(err.message);
@@ -71,8 +93,15 @@ export default function Agents() {
     },
     {
       key: 'user_id',
-      label: 'User ID',
-      render: (v) => <span className="font-mono t-secondary text-sm">User #{v}</span>,
+      label: 'User',
+      render: (v) => (
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400/30 to-primary-600/30 flex items-center justify-center text-primary-600 text-sm font-semibold border border-primary-500/20">
+            {v}
+          </div>
+          <span className="font-mono t-secondary text-sm">User #{v}</span>
+        </div>
+      ),
     },
     {
       key: 'company_id',
@@ -96,11 +125,17 @@ export default function Agents() {
   return (
     <div className="space-y-5 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <p className="text-sm t-muted">{agents.length} agents registered</p>
-        <button onClick={openCreate} className="btn-primary">
-          <Plus size={16} /> Add Agent
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => exportCSV(agents)} className="btn-secondary flex items-center gap-2">
+            <Download size={15} />
+            Export CSV
+          </button>
+          <button onClick={openCreate} className="btn-primary">
+            <Plus size={16} /> Add Agent
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -113,7 +148,7 @@ export default function Agents() {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); openEdit(row); }}
-              className={`p-1.5 rounded-lg hover:text-teal-400 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
+              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
               title="Edit"
             >
               <Pencil size={15} />
@@ -129,7 +164,7 @@ export default function Agents() {
         )}
       />
 
-      {/* Create/Edit Modal */}
+      {/* Modal */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -160,7 +195,7 @@ export default function Agents() {
           </div>
           <div className="flex items-center gap-3 pt-2">
             <button onClick={handleSave} className="btn-primary">
-              <UserCheck size={16} /> {editingAgent ? 'Update Agent' : 'Create Agent'}
+              <UserCheck size={16} /> {editingAgent ? 'Update' : 'Create'}
             </button>
             <button onClick={() => setShowModal(false)} className="btn-secondary">Cancel</button>
           </div>
