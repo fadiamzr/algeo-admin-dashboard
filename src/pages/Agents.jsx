@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Plus, Pencil, Trash2, UserCheck, Download } from 'lucide-react';
 import { apiGetAgents } from '../api';
 
+// ── Export CSV ────────────────────────────────────────────────────────────────
 function exportCSV(data) {
   const headers = ['id', 'user_id', 'company_id'];
   const rows = data.map((a) => [a.id, a.user_id, a.company_id || '']);
@@ -18,6 +19,7 @@ function exportCSV(data) {
   URL.revokeObjectURL(url);
 }
 
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function Agents() {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,10 +29,9 @@ export default function Agents() {
   const [form, setForm] = useState({ user_id: '', company_id: '' });
   const { isDark } = useTheme();
 
-  useEffect(() => {
-    fetchAgents();
-  }, []);
+  useEffect(() => { fetchAgents(); }, []);
 
+  // ── Fetch ──────────────────────────────────────────────────────────────────
   const fetchAgents = () => {
     setLoading(true);
     apiGetAgents()
@@ -39,6 +40,7 @@ export default function Agents() {
       .finally(() => setLoading(false));
   };
 
+  // ── Create / Edit modal ────────────────────────────────────────────────────
   const openCreate = () => {
     setEditingAgent(null);
     setForm({ user_id: '', company_id: '' });
@@ -55,15 +57,15 @@ export default function Agents() {
     if (!form.user_id) return;
     try {
       if (editingAgent) {
-        await fetch(`http://127.0.0.1:8000/api/admin/agents/${editingAgent.id}?company_id=${form.company_id}`, {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
-        });
+        await fetch(
+          `http://127.0.0.1:8000/api/admin/agents/${editingAgent.id}?company_id=${form.company_id}`,
+          { method: 'PUT', headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` } }
+        );
       } else {
-        await fetch(`http://127.0.0.1:8000/api/admin/agents?user_id=${form.user_id}`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
-        });
+        await fetch(
+          `http://127.0.0.1:8000/api/admin/agents?user_id=${form.user_id}`,
+          { method: 'POST', headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` } }
+        );
       }
       fetchAgents();
       setShowModal(false);
@@ -72,6 +74,7 @@ export default function Agents() {
     }
   };
 
+  // ── Delete ─────────────────────────────────────────────────────────────────
   const handleDelete = async (agent) => {
     if (!confirm(`Delete agent #${agent.id}?`)) return;
     try {
@@ -85,6 +88,7 @@ export default function Agents() {
     }
   };
 
+  // ── Table columns ──────────────────────────────────────────────────────────
   const columns = [
     {
       key: 'id',
@@ -110,6 +114,7 @@ export default function Agents() {
     },
   ];
 
+  // ── Guards ─────────────────────────────────────────────────────────────────
   if (loading) return (
     <div className="flex items-center justify-center h-64">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
@@ -122,23 +127,30 @@ export default function Agents() {
     </div>
   );
 
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-5 animate-fade-in">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <p className="text-sm t-muted">{agents.length} agents registered</p>
+
         <div className="flex items-center gap-2">
-          <button onClick={() => exportCSV(agents)} className="btn-secondary flex items-center gap-2">
+          <button
+            onClick={() => exportCSV(agents)}
+            className="btn-secondary flex items-center gap-2"
+          >
             <Download size={15} />
             Export CSV
           </button>
-          <button onClick={openCreate} className="btn-primary">
+
+          <button onClick={openCreate} className="btn-primary flex items-center gap-2">
             <Plus size={16} /> Add Agent
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* ── Table ── */}
       <DataTable
         columns={columns}
         data={agents}
@@ -164,7 +176,7 @@ export default function Agents() {
         )}
       />
 
-      {/* Modal */}
+      {/* ── Add / Edit Modal ── */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -194,13 +206,16 @@ export default function Agents() {
             />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <button onClick={handleSave} className="btn-primary">
+            <button onClick={handleSave} className="btn-primary flex items-center gap-2">
               <UserCheck size={16} /> {editingAgent ? 'Update' : 'Create'}
             </button>
-            <button onClick={() => setShowModal(false)} className="btn-secondary">Cancel</button>
+            <button onClick={() => setShowModal(false)} className="btn-secondary">
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>
+
     </div>
   );
 }
