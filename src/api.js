@@ -41,7 +41,7 @@ export async function apiLogin(email, password) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || 'Invalid credentials');
   }
-  return res.json(); // { access_token }
+  return res.json();
 }
 
 export async function apiGetMe() {
@@ -86,6 +86,7 @@ export async function getDeliveryMapData(status = null) {
 export async function apiGetAgents() {
   return apiFetch('/api/admin/agents');
 }
+
 export async function apiCreateAgent(userId) {
   return apiFetch(`/api/admin/agents?user_id=${userId}`, { method: 'POST' });
 }
@@ -98,6 +99,12 @@ export async function apiUpdateAgent(agentId, companyId) {
 export async function apiDeleteAgent(agentId) {
   return apiFetch(`/api/admin/agents/${agentId}`, { method: 'DELETE' });
 }
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+export async function apiGetUsers() {
+  return apiFetch('/api/admin/users');
+}
+
 // ─── Logs ─────────────────────────────────────────────────────────────────────
 export async function apiGetLogs(limit = 100) {
   return apiFetch(`/api/admin/logs?limit=${limit}`);
@@ -115,6 +122,7 @@ export async function apiGetRequestsPerEndpoint() {
 export async function apiGetScoreDistribution() {
   return apiFetch('/api/admin/analytics/score-distribution');
 }
+
 // ─── Geographic Data ──────────────────────────────────────────────────────────
 export async function apiGetWilayas() {
   return apiFetch('/api/admin/wilayas');

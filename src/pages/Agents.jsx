@@ -3,7 +3,7 @@ import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
 import { Plus, Pencil, Trash2, UserCheck, Download } from 'lucide-react';
-import { apiGetAgents } from '../api';
+import { apiGetAgents, apiCreateAgent, apiUpdateAgent, apiDeleteAgent } from '../api';
 
 // ── Export CSV ────────────────────────────────────────────────────────────────
 function exportCSV(data) {
@@ -35,7 +35,10 @@ export default function Agents() {
   const fetchAgents = () => {
     setLoading(true);
     apiGetAgents()
-      .then((data) => setAgents(data))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (data?.agents ?? data?.items ?? []);
+        setAgents(list);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
@@ -57,18 +60,15 @@ export default function Agents() {
     if (!form.user_id) return;
     try {
       if (editingAgent) {
-        await fetch(
-          `http://127.0.0.1:8000/api/admin/agents/${editingAgent.id}?company_id=${form.company_id}`,
-          { method: 'PUT', headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` } }
+        await apiUpdateAgent(
+          editingAgent.id,
+          form.company_id !== '' ? Number(form.company_id) : null
         );
       } else {
-        await fetch(
-          `http://127.0.0.1:8000/api/admin/agents?user_id=${form.user_id}`,
-          { method: 'POST', headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` } }
-        );
+        await apiCreateAgent(Number(form.user_id));
       }
-      fetchAgents();
       setShowModal(false);
+      fetchAgents();
     } catch (err) {
       alert(err.message);
     }
@@ -78,10 +78,7 @@ export default function Agents() {
   const handleDelete = async (agent) => {
     if (!confirm(`Delete agent #${agent.id}?`)) return;
     try {
-      await fetch(`http://127.0.0.1:8000/api/admin/agents/${agent.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${localStorage.getItem('algeo_token')}` },
-      });
+      await apiDeleteAgent(agent.id);
       fetchAgents();
     } catch (err) {
       alert(err.message);
