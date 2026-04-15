@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
-import { Plus, Pencil, Trash2, UserCheck, Download, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, UserCheck, Download } from 'lucide-react';
 import { apiGetAgents } from '../api';
 
 // ── Export CSV ────────────────────────────────────────────────────────────────
@@ -27,9 +27,6 @@ export default function Agents() {
   const [showModal, setShowModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
   const [form, setForm] = useState({ user_id: '', company_id: '' });
-  const [importing, setImporting] = useState(false);
-  const [importResult, setImportResult] = useState(null);
-  const fileInputRef = useRef(null);
   const { isDark } = useTheme();
 
   useEffect(() => { fetchAgents(); }, []);
@@ -41,35 +38,6 @@ export default function Agents() {
       .then((data) => setAgents(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  };
-
-  // ── Import CSV ─────────────────────────────────────────────────────────────
-  const handleImport = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setImporting(true);
-    setImportResult(null);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const token = localStorage.getItem('algeo_token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/agents/import', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-      const result = await res.json();
-      setImportResult(result);
-      fetchAgents();
-    } catch (err) {
-      setImportResult({ message: 'Import failed', created: 0, errors: [err.message] });
-    } finally {
-      setImporting(false);
-      fileInputRef.current.value = '';
-    }
   };
 
   // ── Create / Edit modal ────────────────────────────────────────────────────
@@ -168,24 +136,6 @@ export default function Agents() {
         <p className="text-sm t-muted">{agents.length} agents registered</p>
 
         <div className="flex items-center gap-2">
-          {/* Hidden file input for CSV import */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            onChange={handleImport}
-            className="hidden"
-          />
-
-          <button
-            onClick={() => fileInputRef.current.click()}
-            disabled={importing}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-60"
-          >
-            <Upload size={15} />
-            {importing ? 'Importing...' : 'Import CSV'}
-          </button>
-
           <button
             onClick={() => exportCSV(agents)}
             className="btn-secondary flex items-center gap-2"
@@ -200,23 +150,6 @@ export default function Agents() {
         </div>
       </div>
 
-      {/* ── Import result banner ── */}
-      {importResult && (
-        <div className={`p-4 rounded-xl text-sm ${importResult.errors?.length > 0
-          ? 'bg-amber-500/10 border border-amber-500/20 text-amber-500'
-          : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
-          }`}>
-          <p className="font-medium">
-            {importResult.message} — {importResult.created} agent{importResult.created !== 1 ? 's' : ''} added
-          </p>
-          {importResult.errors?.length > 0 && (
-            <ul className="mt-2 text-xs space-y-1">
-              {importResult.errors.map((e, i) => <li key={i}>⚠️ {e}</li>)}
-            </ul>
-          )}
-        </div>
-      )}
-
       {/* ── Table ── */}
       <DataTable
         columns={columns}
@@ -227,16 +160,14 @@ export default function Agents() {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); openEdit(row); }}
-              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
-                }`}
+              className={`p-1.5 rounded-lg hover:text-primary-500 transition-colors t-faint ${isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}
               title="Edit"
             >
               <Pencil size={15} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-              className={`p-1.5 rounded-lg hover:text-red-500 transition-colors t-faint ${isDark ? 'hover:bg-red-500/10' : 'hover:bg-red-50'
-                }`}
+              className={`p-1.5 rounded-lg hover:text-red-500 transition-colors t-faint ${isDark ? 'hover:bg-red-500/10' : 'hover:bg-red-50'}`}
               title="Delete"
             >
               <Trash2 size={15} />
