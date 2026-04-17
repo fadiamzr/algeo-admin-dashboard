@@ -1,6 +1,5 @@
 // ─── API Base URL ─────────────────────────────────────────────────────────────
-const BASE_URL = 'http://127.0.0.1:8000';
-
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 // ─── Token helpers ────────────────────────────────────────────────────────────
 export const getToken = () => localStorage.getItem('algeo_token');
 export const setToken = (token) => localStorage.setItem('algeo_token', token);
