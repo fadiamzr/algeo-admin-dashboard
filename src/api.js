@@ -91,6 +91,13 @@ export async function apiCreateAgent(userId) {
   return apiFetch(`/api/admin/agents?user_id=${userId}`, { method: 'POST' });
 }
 
+export async function apiRegisterAgent(name, email) {
+  return apiFetch('/api/admin/agents/register', {
+    method: 'POST',
+    body: JSON.stringify({ name, email }),
+  });
+}
+
 export async function apiUpdateAgent(agentId, companyId) {
   const query = companyId !== null ? `?company_id=${companyId}` : '';
   return apiFetch(`/api/admin/agents/${agentId}${query}`, { method: 'PUT' });
@@ -131,3 +138,4 @@ export async function apiGetWilayas() {
 export async function apiGetCommunes() {
   return apiFetch('/api/admin/communes');
 }
+

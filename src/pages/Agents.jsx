@@ -3,12 +3,11 @@ import DataTable from '../components/tables/DataTable';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
 import { Plus, Pencil, Trash2, UserCheck, Download } from 'lucide-react';
-import { apiGetAgents, apiCreateAgent, apiUpdateAgent, apiDeleteAgent } from '../api';
+import { apiGetAgents, apiRegisterAgent, apiUpdateAgent, apiDeleteAgent } from '../api';
 
-// ── Export CSV ────────────────────────────────────────────────────────────────
 function exportCSV(data) {
-  const headers = ['id', 'user_id', 'company_id'];
-  const rows = data.map((a) => [a.id, a.user_id, a.company_id || '']);
+  const headers = ['id', 'user_id', 'name', 'email', 'company_id'];
+  const rows = data.map((a) => [a.id, a.user_id, a.name || '', a.email || '', a.company_id || '']);
   const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -19,19 +18,18 @@ function exportCSV(data) {
   URL.revokeObjectURL(url);
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function Agents() {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
-  const [form, setForm] = useState({ user_id: '', company_id: '' });
-  const { isDark } = useTheme();
+  const [form, setForm] = useState({ name: '', email: '', company_id: '' });
+  const [formError, setFormError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null); const { isDark } = useTheme();
 
   useEffect(() => { fetchAgents(); }, []);
 
-  // ── Fetch ──────────────────────────────────────────────────────────────────
   const fetchAgents = () => {
     setLoading(true);
     apiGetAgents()
@@ -43,38 +41,54 @@ export default function Agents() {
       .finally(() => setLoading(false));
   };
 
-  // ── Create / Edit modal ────────────────────────────────────────────────────
   const openCreate = () => {
     setEditingAgent(null);
-    setForm({ user_id: '', company_id: '' });
+    setForm({ name: '', email: '', company_id: '' });
+    setFormError(null);
+    setSuccessMsg(null);
     setShowModal(true);
   };
 
   const openEdit = (agent) => {
     setEditingAgent(agent);
-    setForm({ user_id: String(agent.user_id), company_id: String(agent.company_id || '') });
+    setForm({
+      name: agent.name || '',
+      email: agent.email || '',
+      password: '',
+      company_id: String(agent.company_id || ''),
+    });
+    setFormError(null);
     setShowModal(true);
   };
 
   const handleSave = async () => {
-    if (!form.user_id) return;
-    try {
-      if (editingAgent) {
+    setFormError(null);
+    if (editingAgent) {
+      try {
         await apiUpdateAgent(
           editingAgent.id,
           form.company_id !== '' ? Number(form.company_id) : null
         );
-      } else {
-        await apiCreateAgent(Number(form.user_id));
+        setShowModal(false);
+        fetchAgents();
+      } catch (err) {
+        setFormError(err.message);
       }
-      setShowModal(false);
-      fetchAgents();
-    } catch (err) {
-      alert(err.message);
+    } else {
+      if (!form.name || !form.email) {
+        setFormError('Name and email are required');
+        return;
+      }
+      try {
+        const result = await apiRegisterAgent(form.name, form.email);
+        setSuccessMsg(`Agent created!\n\nEmail: ${result.email}\nPassword: ${result.generated_password}`);
+        fetchAgents();
+      } catch (err) {
+        setFormError(err.message);
+      }
     }
   };
 
-  // ── Delete ─────────────────────────────────────────────────────────────────
   const handleDelete = async (agent) => {
     if (!confirm(`Delete agent #${agent.id}?`)) return;
     try {
@@ -85,7 +99,6 @@ export default function Agents() {
     }
   };
 
-  // ── Table columns ──────────────────────────────────────────────────────────
   const columns = [
     {
       key: 'id',
@@ -93,25 +106,21 @@ export default function Agents() {
       render: (v) => <span className="font-mono t-faint text-xs">#{v}</span>,
     },
     {
-      key: 'user_id',
-      label: 'User',
-      render: (v) => (
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400/30 to-primary-600/30 flex items-center justify-center text-primary-600 text-sm font-semibold border border-primary-500/20">
-            {v}
-          </div>
-          <span className="font-mono t-secondary text-sm">User #{v}</span>
-        </div>
-      ),
+      key: 'name',
+      label: 'Name',
+      render: (v) => <span className="font-medium t-primary">{v || '—'}</span>,
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      render: (v) => <span className="t-secondary text-sm">{v || '—'}</span>,
     },
     {
       key: 'company_id',
-      label: 'Company ID',
+      label: 'Company',
       render: (v) => <span className="font-mono t-secondary text-sm">{v || '—'}</span>,
     },
   ];
-
-  // ── Guards ─────────────────────────────────────────────────────────────────
   if (loading) return (
     <div className="flex items-center justify-center h-64">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
@@ -124,14 +133,10 @@ export default function Agents() {
     </div>
   );
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-5 animate-fade-in">
-
-      {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <p className="text-sm t-muted">{agents.length} agents registered</p>
-
         <div className="flex items-center gap-2">
           <button
             onClick={() => exportCSV(agents)}
@@ -140,14 +145,12 @@ export default function Agents() {
             <Download size={15} />
             Export CSV
           </button>
-
           <button onClick={openCreate} className="btn-primary flex items-center gap-2">
             <Plus size={16} /> Add Agent
           </button>
         </div>
       </div>
 
-      {/* ── Table ── */}
       <DataTable
         columns={columns}
         data={agents}
@@ -173,46 +176,89 @@ export default function Agents() {
         )}
       />
 
-      {/* ── Add / Edit Modal ── */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title={editingAgent ? 'Edit Agent' : 'Add New Agent'}
+        title={editingAgent ? 'Edit Agent' : 'Register New Agent'}
       >
         <div className="space-y-4">
-          {!editingAgent && (
-            <div>
-              <label className="block text-xs font-medium t-secondary mb-1.5">User ID</label>
-              <input
-                type="number"
-                value={form.user_id}
-                onChange={(e) => setForm({ ...form, user_id: e.target.value })}
-                className="input-field"
-                placeholder="Enter user ID"
-              />
+          {formError && (
+            <div className="p-3 rounded-xl text-sm bg-red-500/10 border border-red-500/20 text-red-500">
+              {formError}
             </div>
           )}
-          <div>
-            <label className="block text-xs font-medium t-secondary mb-1.5">Company ID</label>
-            <input
-              type="number"
-              value={form.company_id}
-              onChange={(e) => setForm({ ...form, company_id: e.target.value })}
-              className="input-field"
-              placeholder="1001"
-            />
-          </div>
-          <div className="flex items-center gap-3 pt-2">
-            <button onClick={handleSave} className="btn-primary flex items-center gap-2">
-              <UserCheck size={16} /> {editingAgent ? 'Update' : 'Create'}
+
+          {successMsg && (
+            <div className="p-4 rounded-xl text-sm bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 whitespace-pre-line">
+              {successMsg}
+              <button
+                onClick={() => { navigator.clipboard.writeText(successMsg); }}
+                className="mt-2 block text-xs underline opacity-70"
+              >
+                Copy to clipboard
+              </button>
+            </div>
+          )}
+
+          {!successMsg && (
+            <>
+              {!editingAgent && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium t-secondary mb-1.5">Full Name</label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="input-field"
+                      placeholder="Karim Benali"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium t-secondary mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="input-field"
+                      placeholder="karim@algeo.dz"
+                    />
+                  </div>
+                </>
+              )}
+              <div>
+                <label className="block text-xs font-medium t-secondary mb-1.5">
+                  Company ID <span className="t-faint">(optional)</span>
+                </label>
+                <input
+                  type="number"
+                  value={form.company_id}
+                  onChange={(e) => setForm({ ...form, company_id: e.target.value })}
+                  className="input-field"
+                  placeholder="1001"
+                />
+              </div>
+              <div className="flex items-center gap-3 pt-2">
+                <button onClick={handleSave} className="btn-primary flex items-center gap-2">
+                  <UserCheck size={16} /> {editingAgent ? 'Update' : 'Register Agent'}
+                </button>
+                <button onClick={() => setShowModal(false)} className="btn-secondary">
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
+
+          {successMsg && (
+            <button
+              onClick={() => { setShowModal(false); setSuccessMsg(null); }}
+              className="btn-primary w-full"
+            >
+              Done
             </button>
-            <button onClick={() => setShowModal(false)} className="btn-secondary">
-              Cancel
-            </button>
-          </div>
+          )}
         </div>
       </Modal>
-
     </div>
   );
 }
