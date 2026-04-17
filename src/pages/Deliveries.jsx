@@ -68,6 +68,7 @@ export default function Deliveries() {
     formData.append('file', file);
 
     try {
+      const token = localStorage.getItem('algeo_token');
       const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
       const res = await fetch(`${apiUrl}/api/admin/deliveries/import`, {
         method: 'POST',
@@ -84,7 +85,6 @@ export default function Deliveries() {
       fileInputRef.current.value = '';
     }
   };
-
   const filtered = statusFilter === 'all'
     ? data
     : data.filter((d) => d.status === statusFilter);
