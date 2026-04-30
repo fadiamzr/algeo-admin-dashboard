@@ -32,10 +32,13 @@ async function apiFetch(path, options = {}) {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 export async function apiLogin(email, password) {
-  const res = await fetch(
-    `${BASE_URL}/auth/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
-    { method: 'POST' }
-  );
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || 'Invalid credentials');
@@ -79,6 +82,13 @@ export async function getDeliveryMapData(status = null) {
   if (status) params.append('status', status);
   const query = params.toString() ? `?${params}` : '';
   return apiFetch(`/api/admin/deliveries/map${query}`);
+}
+
+export async function apiAssignDelivery(deliveryId, agentId) {
+  return apiFetch(`/api/admin/deliveries/${deliveryId}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify({ agent_id: agentId }),
+  });
 }
 
 // ─── Agents ───────────────────────────────────────────────────────────────────
