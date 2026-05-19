@@ -4,7 +4,7 @@ import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
 import { useTheme } from '../contexts/ThemeContext';
 import { Eye, Download, Upload } from 'lucide-react';
-import { apiGetDeliveries } from '../api';
+import { apiGetDeliveries, apiGetAgents, apiAssignDelivery } from '../api';
 
 function exportCSV(data) {
   const headers = [
@@ -43,6 +43,8 @@ export default function Deliveries() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   const fileInputRef = useRef(null);
+  const [agents, setAgents] = useState([]);
+  const [assigning, setAssigning] = useState(false);
   const { isDark } = useTheme();
 
   const fetchDeliveries = () => {
@@ -53,9 +55,30 @@ export default function Deliveries() {
       .finally(() => setLoading(false));
   };
 
+  const fetchAgents = () => {
+    apiGetAgents()
+      .then((res) => setAgents(Array.isArray(res) ? res : res.items || []))
+      .catch(console.error);
+  };
+
   useEffect(() => {
     fetchDeliveries();
+    fetchAgents();
   }, []);
+
+  const handleAssign = async (deliveryId, newAgentId) => {
+    if (!newAgentId) return;
+    setAssigning(true);
+    try {
+      await apiAssignDelivery(deliveryId, parseInt(newAgentId, 10));
+      setSelectedDelivery((prev) => ({ ...prev, delivery_agent_id: parseInt(newAgentId, 10) }));
+      fetchDeliveries();
+    } catch (err) {
+      alert(`Failed to assign: ${err.message}`);
+    } finally {
+      setAssigning(false);
+    }
+  };
 
   const handleImport = async (e) => {
     const file = e.target.files[0];
@@ -244,13 +267,28 @@ export default function Deliveries() {
                 <div className="mt-1"><StatusBadge status={selectedDelivery.status} /></div>
               </div>
               <div className="glass-card-light p-4">
-                <label className="text-xs font-medium t-faint uppercase">Agent ID</label>
-                <p className="text-sm t-secondary mt-1">Agent #{selectedDelivery.delivery_agent_id}</p>
+                <label className="text-xs font-medium t-faint uppercase">Assigned Agent</label>
+                <div className="mt-1 flex items-center gap-2">
+                  <select
+                    className="input-field text-sm py-1.5 px-2 w-full"
+                    value={selectedDelivery.delivery_agent_id || ''}
+                    disabled={assigning}
+                    onChange={(e) => handleAssign(selectedDelivery.id, e.target.value)}
+                  >
+                    <option value="" disabled>Select Agent</option>
+                    {agents.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name || `Agent #${a.id}`} (ID: {a.id})
+                      </option>
+                    ))}
+                  </select>
+                  {assigning && <div className="animate-spin min-w-[16px] rounded-full h-4 w-4 border-b-2 border-primary-500" />}
+                </div>
               </div>
               <div className="glass-card-light p-4 md:col-span-2">
                 <label className="text-xs font-medium t-faint uppercase">Address</label>
                 <p className="text-sm t-primary mt-1">{selectedDelivery.address || '—'}</p>
-                {selectedDelivery.normalized_address && selectedDelivery.normalized_address !== selectedDelivery.address && (
+                {selectedDelivery.normalized_address && (
                   <p className="text-xs t-muted mt-1">Normalized: {selectedDelivery.normalized_address}</p>
                 )}
               </div>
