@@ -5,8 +5,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('test@test.com');
-  const [password, setPassword] = useState('test123');
+  const [email, setEmail] = useState('admin@algeo.com');
+  const [password, setPassword] = useState('admin1234');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -49,9 +49,8 @@ export default function Login() {
       {/* Theme toggle */}
       <button
         onClick={toggleTheme}
-        className={`absolute top-6 right-6 z-10 p-2.5 rounded-xl transition-all duration-300 ${
-          isDark ? 'hover:bg-white/5 text-navy-400 hover:text-amber-400' : 'hover:bg-black/5 text-navy-500 hover:text-teal-500'
-        }`}
+        className={`absolute top-6 right-6 z-10 p-2.5 rounded-xl transition-all duration-300 ${isDark ? 'hover:bg-white/5 text-navy-400 hover:text-amber-400' : 'hover:bg-black/5 text-navy-500 hover:text-teal-500'
+          }`}
         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       >
         {isDark ? <Sun size={20} /> : <Moon size={20} />}
