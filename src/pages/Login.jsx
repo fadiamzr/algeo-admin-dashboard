@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@algeo.com');
+  const [email, setEmail] = useState('admin@algeo.dz');
   const [password, setPassword] = useState('admin1234');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
